@@ -11,9 +11,13 @@ You can use this advantage and shoot multiple requests to the server and
 5) Retry Offlines
 
 
+#OR
 
 
-You can also use this package to convert from text to image and then save it.
+You can just simply let the library do make the request and then let just track if any errors.
+
+`clearAll()`, or specific buffer when you feel its the right time.!!!!
+
 
 
 ## Installation
@@ -21,7 +25,7 @@ You can also use this package to convert from text to image and then save it.
 To install this library, run:
 
 ```bash
-$ npm install txt-img --save
+$ npm install ngx-api-gun --save
 ```
 
 ## Consuming this library
@@ -29,7 +33,7 @@ $ npm install txt-img --save
 You can import your library in any Angular application by running:
 
 ```bash
-$ npm install txt-img
+$ npm install ngx-api-gun
 ```
 
 and then from your Angular `AppModule`:
@@ -83,16 +87,16 @@ export class AppComponent {
   // Initilizing Bullets
   Req: RequestBullet = new RequestBullet();
   // Injection of Gun Service
-  constructor(public _bridge: ApiGunService) {
+  constructor(public _gun: ApiGunService) {
 
   }
 
   addHeader() {
-    this._bridge.appendHeader('key', 'value');
+    this._gun.appendHeader('key', 'value');
   }
   
   addAuthorization() {
-    this._bridge.setBasicAuthorizationHeader('username','password');
+    this._gun.setBasicAuthorizationHeader('username','password');
   }
 
 
@@ -100,31 +104,31 @@ export class AppComponent {
     // Object.assign
     let x = JSON.parse(JSON.stringify(this.Req));
     //load a single request to buffer it 
-    let id = this._bridge.loadSingleBullet(x);
+    let id = this._gun.loadSingleBullet(x);
     //initialize again
     this.Req = new RequestBullet();
   }
 
   shootRequest() {
       // shoot all pending request
-    this._bridge.fire();
+    this._gun.fire();
   }
 
   logSuccess() {
-    this._bridge.logBufferToConsole(Buffer.SUCCESS);
+    this._gun.logBufferToConsole(Buffer.SUCCESS);
   }
   logError() {
-    this._bridge.logBufferToConsole(Buffer.ERROR);
+    this._gun.logBufferToConsole(Buffer.ERROR);
   }
   logAll() {
-    this._bridge.logBufferToConsole(Buffer.MAIN);
+    this._gun.logBufferToConsole(Buffer.MAIN);
   }
   // simply retry errors any time.
   retryError() {
-    this._bridge.retryErrors();
+    this._gun.retryErrors();
   }
   retryOffline() {
-    this._bridge.retryOfflines();
+    this._gun.retryOfflines();
   }
 
 }
