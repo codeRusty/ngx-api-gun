@@ -9,7 +9,11 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "packagr": "ng-packagr -p ng-package.json"
+    "packagr": "ng-packagr -p ng-package.json",
+    "docs": "npm run docs:build",
+    "docs:build": "compodoc -p tsconfig.json -n ngx-api-gun -d docs --hideGenerator",
+    "docs:serve": "npm run docs:build -- -s",
+    "docs:watch": "npm run docs:build -- -s -w"
   },
   "private": false,
   "dependencies": {

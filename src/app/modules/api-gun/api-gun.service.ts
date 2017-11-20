@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RequestBullet, RequestType, Buffer } from './request-buffer';
+import { RequestBullet, RequestType, Buffer } from './request-bullet';
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http'
 
 @Injectable()

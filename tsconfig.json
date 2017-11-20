@@ -1,6 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "./src/app/modules/api-gun",
+    "rootDir": "./src/app/modules/api-gun",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
