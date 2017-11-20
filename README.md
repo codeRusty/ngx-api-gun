@@ -2,13 +2,13 @@
 
 The AngularJS Http Client Wrapper Created to Ease things up.
  Buffer each and evry requests and track the response. 
+
 You can use this advantage and shoot multiple requests to the server and 
 1) later on check the response 
 2) Get all the request where Error occoured
-3) Get all the request where Error occoured
-4) Check if any pending Offline request
-5) Retry Errors
-6) Retry Offlines
+3) Check if any pending Offline request (request made while client was offline)
+4) Retry Errors
+5) Retry Offlines
 
 
 
@@ -34,8 +34,14 @@ $ npm install txt-img
 
 and then from your Angular `AppModule`:
 
+`File :` app.module.ts
 
 ```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
 import { AppComponent } from './app.component';
 
 import { ApiGunModule, ApiGunService, Buffer, RequestBullet, RequestType } from 'ngx-api-gun'
@@ -45,15 +51,22 @@ import { ApiGunModule, ApiGunService, Buffer, RequestBullet, RequestType } from 
     AppComponent
   ],
   imports: [
-    ApiGunModule // <-- Module added to provider
+    HttpClientModule,
+    BrowserModule,
+    FormsModule,
+    //our module
+    ApiGunModule
   ],
-  providers: [ApiGunService],// <-- Service added to provider
+  //our service Note: In later updated forRoot() added.
+  providers: [ApiGunService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
 ```
 and then from your Angular `AppModule`:
 
+`File :` app.component.ts
 
 ```typescript
 import { Component } from '@angular/core';
@@ -74,13 +87,26 @@ export class AppComponent {
 
   }
 
+  addHeader() {
+    this._bridge.appendHeader('key', 'value');
+  }
+  
+  addAuthorization() {
+    this._bridge.setBasicAuthorizationHeader('username','password');
+  }
+
+
   addRequest() {
+    // Object.assign
     let x = JSON.parse(JSON.stringify(this.Req));
-    this._bridge.loadSingleBullet(x);
+    //load a single request to buffer it 
+    let id = this._bridge.loadSingleBullet(x);
+    //initialize again
     this.Req = new RequestBullet();
   }
 
   shootRequest() {
+      // shoot all pending request
     this._bridge.fire();
   }
 
@@ -93,8 +119,12 @@ export class AppComponent {
   logAll() {
     this._bridge.logBufferToConsole(Buffer.MAIN);
   }
+  // simply retry errors any time.
   retryError() {
     this._bridge.retryErrors();
+  }
+  retryOffline() {
+    this._bridge.retryOfflines();
   }
 
 }
@@ -102,7 +132,9 @@ export class AppComponent {
 ```
 ## View
 
-```xml
+`File :` app.component.html
+
+```xml 
 <div>
 <ul>
   <li>
@@ -165,7 +197,7 @@ To lint all `*.ts` files:
 $ npm run lint
 ```
 
-To lint all `*.ts` files:
+To `docs`
 
 ```bash
 $ npm run docs:build

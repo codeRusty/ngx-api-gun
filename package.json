@@ -15,6 +15,20 @@
     "docs:serve": "npm run docs:build -- -s",
     "docs:watch": "npm run docs:build -- -s -w"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codeRusty/ngx-api-gun.git"
+  },
+  "author": {
+    "name": "Sourabh Rustagi",
+    "email": "sourabh.rustagi@hotmail.com"
+  },
+  "keywords": [
+    "angular"
+  ],
+  "bugs": {
+    "url": "https://github.com/codeRusty/ngx-api-gun.git/issues"
+  },
   "private": false,
   "dependencies": {
     "@angular/animations": "^5.0.0",
