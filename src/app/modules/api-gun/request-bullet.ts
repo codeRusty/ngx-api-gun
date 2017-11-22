@@ -44,7 +44,7 @@ export class RequestBullet implements IRequestBullet {
 
 }
 
-export enum Buffer {
+export enum BufferType {
     MAIN, ERROR, OFFLINE, SUCCESS
 }
 

@@ -48,7 +48,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
-import { ApiGunModule, ApiGunService, Buffer, RequestBullet, RequestType } from 'ngx-api-gun'
+import { ApiGunModule, ApiGunService, BufferType, RequestBullet, RequestType } from 'ngx-api-gun'
 
 @NgModule({
   declarations: [
@@ -76,7 +76,7 @@ and then from your Angular `AppModule`:
 import { Component } from '@angular/core';
 
 // New import
-import { ApiGunModule, ApiGunService, Buffer, RequestBullet, RequestType } from 'ngx-api-gun'
+import { ApiGunModule, ApiGunService, BufferType, RequestBullet, RequestType } from 'ngx-api-gun'
 
 @Component({
   selector: 'app-root',
@@ -115,13 +115,13 @@ export class AppComponent {
   }
 
   logSuccess() {
-    this._gun.logBufferToConsole(Buffer.SUCCESS);
+    this._gun.logBufferToConsole(BufferType.SUCCESS);
   }
   logError() {
-    this._gun.logBufferToConsole(Buffer.ERROR);
+    this._gun.logBufferToConsole(BufferType.ERROR);
   }
   logAll() {
-    this._gun.logBufferToConsole(Buffer.MAIN);
+    this._gun.logBufferToConsole(BufferType.MAIN);
   }
   // simply retry errors any time.
   retryError() {
@@ -129,6 +129,13 @@ export class AppComponent {
   }
   retryOffline() {
     this._gun.retryOfflines();
+  }
+  setBufferToLocal() {
+    this._gun.saveBulletsToLS();
+  }
+
+  setBufferFromLocal() {
+    this._gun.loadBulletsFromLS();
   }
 
 }
@@ -165,6 +172,12 @@ export class AppComponent {
   <li>
     <button (click)="retryError()">Retry Error</button>
   </li>
+  <li>
+      <button (click)="setBufferToLocal()">Save Locally</button>
+   </li>
+   <li>
+      <button (click)="setBufferFromLocal()">get from LS</button>
+   </li>
 </ul>
 </div>
 ```

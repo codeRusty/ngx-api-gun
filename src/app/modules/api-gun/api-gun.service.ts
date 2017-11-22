@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { RequestBullet, RequestType, Buffer } from './request-bullet';
+import { RequestBullet, RequestType, BufferType } from './request-bullet';
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http'
+import * as crypto from "crypto-browserify";
+import { Buffer } from 'buffer/';
+const LSKEY = 'en_mb';
 
 @Injectable()
 export class ApiGunService {
@@ -12,15 +15,17 @@ export class ApiGunService {
   private ErrorBuffer: RequestBullet[] = [];
   private SuccessBuffer: RequestBullet[] = [];
 
-  public errorCount
   //Other private members of the class
-  private _secretKey: string = "";
+
   private _headers: HttpHeaders = new HttpHeaders();
-  private _isConnected: boolean;
+
+
+  private _secretKey: string = 'secret-key'; // default
+  public algorithm = 'aes-256-ctr'; // default
   //#endregion Properties
 
   constructor(public _HttpClient: HttpClient) {
-    this._isConnected = navigator.onLine;
+
   }
 
 
@@ -63,6 +68,15 @@ export class ApiGunService {
   public loadSingleBullet(request: RequestBullet): string {
     this.MainBuffer.push(request);
     return request.id.toString();
+
+  }
+
+  /**
+ * Adds multiple requests to *MainBuffer* to Shoot later 
+ * @param requestBullets 
+ */
+  public fillBullets(requestBullets: RequestBullet[]) {
+    this.MainBuffer.concat(requestBullets);
   }
 
   /**
@@ -94,7 +108,7 @@ export class ApiGunService {
  * Shoots a single Request from the *MainBuffer* to the server by ID
  * @param id 
  */
-  public shootSingleBullet(id: string) {
+  public shootSingleBullet(id: string): void {
     for (let index = 0; index < this.MainBuffer.length; index++) {
       let element = this.MainBuffer[index]
       if (element.id == id) {
@@ -136,6 +150,31 @@ export class ApiGunService {
       }
 
     });
+  }
+
+  public recoil(request: RequestBullet) {
+    this.MainBuffer.forEach(element => {
+      // Check if Online
+      if (navigator.onLine) {
+        this.shootToServer(element);
+      }
+      else {
+        this.handelOffline(element)
+      }
+
+    });
+  }
+
+
+  /**
+* Reload 
+* Copy *ErrorBuffer* and *OfflineBuffer* into the  *MainBuffer*
+*/
+  public reload() {
+    this.MainBuffer.concat(this.ErrorBuffer);
+    this.MainBuffer.concat(this.OfflineBuffer);
+    this.ErrorBuffer = [];
+    this.OfflineBuffer = [];
   }
 
 
@@ -194,25 +233,25 @@ export class ApiGunService {
    * Just Logs all requests in client's browser console.
    * @param bufferType 
    */
-  public logBufferToConsole(bufferType: Buffer) {
+  public logBufferToConsole(bufferType: BufferType) {
 
     switch (bufferType) {
-      case Buffer.MAIN:
+      case BufferType.MAIN:
         this.MainBuffer.forEach(element => {
           console.log(element);
         });
         break;
-      case Buffer.ERROR:
+      case BufferType.ERROR:
         this.ErrorBuffer.forEach(element => {
           console.log(element);
         });
         break;
-      case Buffer.SUCCESS:
+      case BufferType.SUCCESS:
         this.SuccessBuffer.forEach(element => {
           console.log(element);
         });
         break;
-      case Buffer.OFFLINE:
+      case BufferType.OFFLINE:
         this.OfflineBuffer.forEach(element => {
           console.log(element);
         });
@@ -228,23 +267,24 @@ export class ApiGunService {
   /**
    * Save all requests in client's browser LocalStorage.
    */
-  public saveToLocalStorage() {
-    // let encrptyedRequest: any
-    // let MainBufferStirng = JSON.stringify(this.MainBuffer)
-    // let encryptedMainBufferStirng = crypto.AES.encrypt(MainBufferStirng, this._secretKey).toString();
-    // localStorage.setItem("encryptedMainBufferStirng", encryptedMainBufferStirng);
-
-    // let bytes = crypto.AES.e(txt.toString(), "secret").toString();
-    // var plaintext = bytes.toString(crypto.enc.Utf8);
-    // console.log(plaintext);
+  public saveBulletsToLS() {
+    let encrptyedRequest: any
+    if (this.MainBuffer.length > 0) {
+      let bufferStirng = JSON.stringify(this.MainBuffer)
+      let encryptedMainBufferStirng = this.encrypt(bufferStirng);
+      localStorage.setItem(LSKEY, encryptedMainBufferStirng);
+    }
   }
 
   /**
    * Gets all requests in client's browser LocalStorage.
    */
-  public getFromLocalStorage() {
-    // let encryptedMainBufferStirng = localStorage.getItem("encryptedMainBufferStirng");
-    // let MainBufferStirng = JSON.stringify(encryptedMainBufferStirng)
+  public loadBulletsFromLS() {
+    let encryptedMainBufferStirng = localStorage.getItem(LSKEY);
+    if (encryptedMainBufferStirng) {
+      let dcryptedMainBufferStirng = this.decrypt(encryptedMainBufferStirng);
+      this.MainBuffer.concat(JSON.parse(dcryptedMainBufferStirng));
+    }
   }
 
   /**
@@ -463,6 +503,20 @@ export class ApiGunService {
   //#endregion Request Wrappers + Request Handlers
 
 
+
+  encrypt(text) {
+    var cipher = crypto.createCipher(this.algorithm, this._secretKey)
+    var crypted = cipher.update(text, 'utf8', 'hex')
+    crypted += cipher.final('hex');
+    return crypted;
+  }
+
+  decrypt(text) {
+    var decipher = crypto.createDecipher(this.algorithm, this._secretKey)
+    var dec = decipher.update(text, 'hex', 'utf8')
+    dec += decipher.final('utf8');
+    return dec;
+  }
 
 
 
