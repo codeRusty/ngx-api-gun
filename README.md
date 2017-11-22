@@ -222,9 +222,19 @@ $ npm run docs:build
 
 ## Change log
 
+### v1.5.0
+
+- ecrypting before saving to LS and Buffer change to BufferType
+
+### v1.4.0
+
+- Remove abstracted component.
+
 ### v1.3.0
 
 - Working Library , with all abstraction
+
+
 
 
 ## License
